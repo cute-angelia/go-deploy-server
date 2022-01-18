@@ -22,6 +22,7 @@ go.sum
 */.DS_Store
 
 *.log
+*.log.*
 
 api/webproxy/webproxy.log.*
 api/*/*.log
