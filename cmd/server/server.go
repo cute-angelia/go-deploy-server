@@ -3,49 +3,49 @@ package main
 import (
 	"bufio"
 	"github.com/cute-angelia/go-utils/logger"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"go-deploy/config"
-	"go-deploy/ctrl"
+	"go-deploy/internal/controller"
 	"log"
 	"net"
 	"net/http"
 	"time"
 )
 
+const TYPE_SITE = "go-deploy-server"
+
 func main() {
 	// 日志
-	logger.NewLogger("go-deploy-server", !config.C.Debug)
+	logger.NewLogger(TYPE_SITE, !config.C.Debug)
 
-	//start http server
-	log.Printf("Start http server listening %s", config.C.ListenHttp)
-	http.HandleFunc("/", ctrl.Index)
-	http.HandleFunc("/list", ctrl.List)
-	http.HandleFunc("/deply", ctrl.Deply)
-	http.HandleFunc("/rollback", ctrl.Rollback)
-	http.HandleFunc("/showlog", ctrl.ShowLog)
+	// router
+	r := chi.NewRouter()
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Timeout(30 * time.Second))
+	r.Use(middleware.ThrottleBacklog(20, 500, time.Second))
 
-	s := &http.Server{
-		Addr:           config.C.ListenHttp,
-		Handler:        http.DefaultServeMux,
-		ReadTimeout:    30 * time.Second,
-		WriteTimeout:   30 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
-	go func() {
-		if err := s.ListenAndServe(); err != nil {
-			log.Println(err)
-		}
-	}()
+	// 中间件
+	r.Route("/", func(r chi.Router) {
+		r.Mount("/", controller.Index{}.Routes())
 
+		r.Mount("/list", controller.List{}.Routes())
+		r.Mount("/deply", controller.Deply{}.Routes())
+		r.Mount("/rollback", controller.Rollback{}.Routes())
+		r.Mount("/showlog", controller.ShowLog{}.Routes())
+	})
+
+	// Ping
 	for addr := range config.C.UniqAddr {
 		go Ping(addr)
 	}
 
-	//block
-	ticker := time.Tick(time.Second * 10)
-	for {
-		select {
-		case <-ticker:
-		}
+	log.Println(TYPE_SITE + "启动成功~ " + config.C.ListenHttp)
+	if err := http.ListenAndServe(config.C.ListenHttp, r); err != nil {
+		log.Println("启动错误：", err)
 	}
 }
 

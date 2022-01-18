@@ -1,6 +1,6 @@
 {
   "listen_http": ":8082",
-  "debug": false,
+  "debug": true,
   "apps": [
     {
       "name": "douke",

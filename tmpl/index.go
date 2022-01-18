@@ -157,6 +157,7 @@ func GetIndexTpl() string {
     function loadData() {
         $.ajax({
             url: "/list",
+    		type: "POST",
             dataType: "json",
             success: function (json) {
                 if (json != null) {
