@@ -1,11 +1,14 @@
-# ！！ fork 版本跟原版不一样 ！！
-
-fork版本改动很多
-
-增加 go mod并改动了一些目录结构匹配go开发规范
-
 # go-deploy
 web集群一键上线工具，支持svn、git。增量更新、回滚，100+服务器节点秒级完成部署。
+
+# 参考
+[项目大部分代码参考了ikool-cn/go-deploy](https://github.com/ikool-cn/go-deploy/)
+
+与参考项目差异点在于：
+
+1. 支持windows
+2. 前端代码重构
+3. go目录结构符合golang开发规范
 
 # Screenshot
 ![](https://github.com/ikool-cn/go-deploy/blob/master/Screenshot.png)
@@ -20,9 +23,6 @@ web集群一键上线工具，支持svn、git。增量更新、回滚，100+服�
 - 支持befor_deploy、after_deploy 部署前和部署后的hook命令，清理缓存、执行重启等操作。 如：sudo service php-fpm reload
 - 控制面板、简单易用、无需复杂配置。
 - server端配置hook命令，避免web端配置hook带来的风险
-
-### 编译安装
- - 可以自行编译或者直接下载bin目录下的二进制文件(编译环境centos 7.9)。
  
 ### Server端配置
 ```
