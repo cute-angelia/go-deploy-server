@@ -12,6 +12,7 @@ import (
 
 type Config struct {
 	ListenHttp string          `json:"listen_http"`
+	Debug      bool            `json:"debug"`
 	Apps       []Apps          `json:"apps"`
 	UniqAddr   map[string]bool `json:"-"`
 }

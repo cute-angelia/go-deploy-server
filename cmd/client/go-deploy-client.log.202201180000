@@ -1,0 +1,15 @@
+2022/01/18 11:19:34 logger.go:112: 记录日志 ./go-deploy-client.log
+2022/01/18 11:19:34 client.go:48: Start tcp server listening :8081
+2022/01/18 11:19:40 logger.go:112: 记录日志 ./go-deploy-client.log
+2022/01/18 11:19:40 client.go:48: Start tcp server listening :8084
+2022/01/18 11:19:42 client.go:63: Received new connection 127.0.0.1:56331 -> 127.0.0.1:8081 
+2022/01/18 11:19:42 client.go:63: Received new connection 127.0.0.1:56332 -> 127.0.0.1:8084 
+2022/01/18 11:19:49 client.go:74: Server closed EOF
+2022/01/18 11:19:49 client.go:74: Server closed EOF
+2022/01/18 11:19:54 client.go:63: Received new connection 127.0.0.1:56335 -> 127.0.0.1:8084 
+2022/01/18 11:19:54 client.go:63: Received new connection 127.0.0.1:56336 -> 127.0.0.1:8081 
+2022/01/18 11:20:35 logger.go:112: 记录日志 ./go-deploy-client.log
+2022/01/18 11:20:35 client.go:48: Start tcp server listening :8081
+2022/01/18 11:20:39 client.go:63: Received new connection 127.0.0.1:56358 -> 127.0.0.1:8081 
+2022/01/18 11:23:51 client.go:74: Server closed EOF
+2022/01/18 11:23:51 client.go:74: Server closed EOF

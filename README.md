@@ -1,6 +1,11 @@
 # go-deploy
 web集群一键上线工具，支持svn、git。增量更新、回滚，100+服务器节点秒级完成部署。
 
+
+# ！！！！ fork 版本跟原版不一样 ！！！！
+
+当前版本改动了一些目录结构和增加 go mod
+
 # Screenshot
 ![](https://github.com/ikool-cn/go-deploy/blob/master/Screenshot.png)
 
