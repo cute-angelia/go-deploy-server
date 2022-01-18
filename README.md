@@ -1,11 +1,6 @@
 # go-deploy
 web集群一键上线工具，支持svn、git。增量更新、回滚，100+服务器节点秒级完成部署。
 
-# 参考
-[项目大部分代码参考了ikool-cn/go-deploy](https://github.com/ikool-cn/go-deploy/)
-
-与参考项目差异点在于：
-
 1. 支持windows
 2. 前端代码重构
 3. go目录结构符合golang开发规范
@@ -98,3 +93,6 @@ server {
    }
 }
 ```
+
+# 参考
+[项目代码参考了ikool-cn/go-deploy](https://github.com/ikool-cn/go-deploy/)

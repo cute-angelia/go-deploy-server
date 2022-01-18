@@ -16,6 +16,9 @@ import (
 const TYPE_SITE = "go-deploy-server"
 
 func main() {
+	// config
+	config.InitConfig()
+
 	// 日志
 	logger.NewLogger(TYPE_SITE, !config.C.Debug)
 

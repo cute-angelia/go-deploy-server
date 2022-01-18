@@ -39,7 +39,7 @@ type Node struct {
 var C *Config
 var configUsage = `Usage: /pathto/server -c /pathto/server.json`
 
-func init() {
+func InitConfig() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, configUsage+"\n")
 	}

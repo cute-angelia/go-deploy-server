@@ -3,10 +3,12 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"github.com/cute-angelia/go-utils/syntax/istrings"
 	"github.com/go-chi/chi/v5"
 	"go-deploy/config"
 	"go-deploy/helper"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -48,11 +50,23 @@ func showlog(groupid string) (list LogList, err error) {
 
 //svn log --limit 100 svn://x.x.x.x/path
 func showSvnLog(app config.Apps) (list LogList, err error) {
-	bytes, err := helper.RunShell(fmt.Sprintf("svn log --limit 100 %s", app.Url))
+	bytes, err := helper.RunShell(fmt.Sprintf("svn log --limit 20 %s", app.Url))
 	if err != nil {
 		return nil, err
 	} else {
-		match := svnlogRegex.FindAllSubmatch(bytes, -1)
+		var convertStr string
+		var svnlogRegex = new(regexp.Regexp)
+		if helper.IsWin() {
+			convertStr = istrings.GbkToUtf8(string(bytes))
+			svnlogRegex = regexp.MustCompile(`r(\d+) \| (\w+) \| (.*) \+0800(?:.*)\r\n\r\n(.*)\r\n--`)
+		} else {
+			convertStr = string(bytes)
+			svnlogRegex = regexp.MustCompile(`r(\d+) \| (\w+) \| (.*) \+0800(?:.*)\n\n(.*)\n--`)
+		}
+
+		// log.Println(convertStr)
+		match := svnlogRegex.FindAllStringSubmatch(convertStr, -1)
+
 		logList := make(LogList, 0)
 		for _, item := range match {
 			svnlog := LogEntity{Reversion: string(item[1]), Author: string(item[2]), Time: string(item[3]), Content: string(item[4])}
@@ -64,7 +78,7 @@ func showSvnLog(app config.Apps) (list LogList, err error) {
 
 //cd /pathto/xx && git log -50 --pretty="%h {CRLF} %an {CRLF} %at {CRLF} %s"
 func showGitLog(app config.Apps) (list LogList, err error) {
-	cmd := fmt.Sprintf(`cd %s && git log -100 --pretty="%%h %s %%an %s %%at %s %%s"`, app.Fetchlogpath, separator, separator, separator)
+	cmd := fmt.Sprintf(`cd %s && git log -20 --pretty="%%h %s %%an %s %%at %s %%s"`, app.Fetchlogpath, separator, separator, separator)
 	bytes, err := helper.RunShell(cmd)
 	if err != nil {
 		return nil, err

@@ -34,7 +34,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, usage)
 	}
 	listening = flag.String("l", ":8081", usage)
-	debug = flag.String("d", "false", usage)
+	debug = flag.String("d", "true", usage)
 	flag.Parse()
 	if *listening == "" {
 		flag.Usage()
@@ -148,7 +148,6 @@ func processTask(message string) ([]byte, error) {
 		}
 
 		//exec command
-		log.Println("exec command:", command)
 		byt, err := helper.RunShell(command)
 		if err != nil {
 			return nil, err
