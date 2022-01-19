@@ -3,9 +3,10 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/cute-angelia/go-utils/http/api"
+	"github.com/cute-angelia/go-utils/http/validation"
 	"github.com/go-chi/chi/v5"
 	"go-deploy/config"
-	"go-deploy/helper"
 	"net/http"
 	"strconv"
 	"strings"
@@ -22,9 +23,33 @@ func (rs Rollback) Routes() chi.Router {
 }
 
 func (rs Rollback) index(w http.ResponseWriter, r *http.Request) {
+	// 参数校验
+	valid := validation.Validation{}
+	var u = struct {
+		Groupid   string `valid:"Required;"`
+		Reversion string `valid:"Required;"`
+	}{
+		Groupid:   api.Post(r, "groupid"),
+		Reversion: api.Post(r, "reversion"),
+	}
+	if err := valid.Submit(u); err != nil {
+		api.Error(w, r, nil, err.Error(), -1)
+		return
+	}
+
 	start := time.Now()
-	ret := rollback(r.PostFormValue("groupid"), r.PostFormValue("reversion"))
-	fmt.Fprintf(w, "%s\n", helper.JsonResp(true, "", strconv.FormatFloat(time.Since(start).Seconds(), 'f', 3, 64), strings.Replace(ret, separator, "\n", -1)))
+	ret := rollback(u.Groupid, u.Reversion)
+
+	resp := struct {
+		TimeCos string `json:"time_cos"`
+		Msg     string `json:"msg"`
+	}{
+		TimeCos: strconv.FormatFloat(time.Since(start).Seconds(), 'f', 3, 64),
+		Msg:     strings.Replace(ret, separator, "\n", -1),
+	}
+
+	api.Success(w, r, resp, "success")
+	return
 }
 
 //send a rollback message to the group nodes

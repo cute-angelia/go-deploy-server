@@ -3,10 +3,12 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"github.com/cute-angelia/go-utils/http/api"
+	"github.com/cute-angelia/go-utils/http/validation"
 	"github.com/cute-angelia/go-utils/syntax/istrings"
 	"github.com/go-chi/chi/v5"
 	"go-deploy/config"
-	"go-deploy/helper"
+	"go-deploy/internal/helper"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -23,13 +25,26 @@ func (rs ShowLog) Routes() chi.Router {
 	return r
 }
 
+// showlog
 func (rs ShowLog) index(w http.ResponseWriter, r *http.Request) {
-	list, err := showlog(r.PostFormValue("groupid"))
-	if err != nil {
-		fmt.Fprintf(w, "%s\n", helper.JsonResp(false, err.Error(), "", nil))
-	} else {
-		fmt.Fprintf(w, "%s\n", helper.JsonResp(true, "", "", list))
+	valid := validation.Validation{}
+	var u = struct {
+		Groupid string `valid:"Required;"`
+	}{
+		Groupid: api.Post(r, "groupid"),
 	}
+	if err := valid.Submit(u); err != nil {
+		api.Error(w, r, nil, err.Error(), -1)
+		return
+	}
+
+	list, err := showlog(u.Groupid)
+	if err != nil {
+		api.Error(w, r, nil, err.Error(), -1)
+	} else {
+		api.Success(w, r, list, "success")
+	}
+	return
 }
 
 func showlog(groupid string) (list LogList, err error) {

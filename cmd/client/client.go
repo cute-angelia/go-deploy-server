@@ -8,7 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/cute-angelia/go-utils/logger"
-	"go-deploy/helper"
+	"go-deploy/internal/helper"
 	"log"
 	"net"
 	"os"

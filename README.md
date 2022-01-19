@@ -4,6 +4,7 @@ web集群一键上线工具，支持svn、git。增量更新、回滚，100+服�
 1. 支持windows
 2. 前端代码重构
 3. go目录结构符合golang开发规范
+4. 注重安全，接口过滤敏感信息
 
 # Screenshot
 ![](https://github.com/ikool-cn/go-deploy/blob/master/Screenshot.png)
