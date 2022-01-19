@@ -1,24 +1,21 @@
 # go-deploy
-web集群一键上线工具，支持svn、git。增量更新、回滚，100+服务器节点秒级完成部署。
 
-1. 支持windows
-2. 前端代码重构
-3. go目录结构符合golang开发规范
-4. 注重安全，接口过滤敏感信息
+上线发布工具：更新，回滚; 支持svn、git
+
+1. 多平台支持windows, linux
+2. 前端代码Vue 3.0
+3. 注重安全，接口过滤敏感信息
 
 # Screenshot
 ![](https://github.com/ikool-cn/go-deploy/blob/master/Screenshot.png)
 
 ### 特性
-- 支持svn和git
-- 支持多项目、多节点、多环境、分布式集群环境批量更新和回滚操作
-- golang的高性能并发加持，上百台节点秒级完成部署
-- 无需svn或git账号密码、无需免密登录目标机 降低安全风险
+- 平台支持 windows, linux
+- 支持 svn 和 git
+- 无需svn或git账号密码、无需免密登录目标机
 - 增量更新、回滚，速度更快
 - server和client采用tcp通讯+心跳保活 节点在线状态实时监控
 - 支持befor_deploy、after_deploy 部署前和部署后的hook命令，清理缓存、执行重启等操作。 如：sudo service php-fpm reload
-- 控制面板、简单易用、无需复杂配置。
-- server端配置hook命令，避免web端配置hook带来的风险
  
 ### Server端配置
 ```
