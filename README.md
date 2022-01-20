@@ -2,12 +2,15 @@
 
 上线发布工具：更新，回滚; 支持svn、git
 
+为什么会有这个工具？
+因项目网络隔离，另外，其他部署工具，如：Jenkins，部署多地非常麻烦
+
 1. 多平台支持windows, linux
 2. 前端代码Vue 3.0
 3. 注重安全，接口过滤敏感信息
 
 # Screenshot
-![](https://github.com/ikool-cn/go-deploy/blob/master/Screenshot.png)
+![](https://github.com/cute-angelia/go-deploy-server/blob/master/screenshot1.png)
 
 ### 特性
 - 平台支持 windows, linux
