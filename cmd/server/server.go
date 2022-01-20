@@ -2,17 +2,26 @@ package main
 
 import (
 	"bufio"
+	"embed"
+	"errors"
 	"github.com/cute-angelia/go-utils/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"go-deploy/config"
 	"go-deploy/internal/controller"
+	"io"
 	"log"
+	"mime"
 	"net"
 	"net/http"
+	"path"
+	"path/filepath"
 	"time"
 )
+
+//go:embed vue/dist/*
+var assets embed.FS
 
 const TYPE_SITE = "go-deploy-server"
 
@@ -47,13 +56,13 @@ func main() {
 
 	// 中间件
 	r.Route("/", func(r chi.Router) {
-		r.Mount("/", controller.Index{}.Routes())
-
 		r.Mount("/list", controller.List{}.Routes())
 		r.Mount("/deploy", controller.Deploy{}.Routes())
 		r.Mount("/rollback", controller.Rollback{}.Routes())
 		r.Mount("/showlog", controller.ShowLog{}.Routes())
 	})
+
+	r.NotFound(NotFoundHandler)
 
 	// Ping
 	for addr := range config.C.UniqAddr {
@@ -126,4 +135,34 @@ func setClientOnlineStatus(addr string, online bool) {
 			}
 		}
 	}
+}
+
+func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
+	err := tryRead(assets, "vue/dist", r.URL.Path, w)
+	if err == nil {
+		return
+	}
+	err = tryRead(assets, "vue/dist", "index.html", w)
+	if err != nil {
+		log.Println(err)
+	}
+}
+var ErrDir = errors.New("path is dir")
+func tryRead(fs embed.FS, prefix, requestedPath string, w http.ResponseWriter) error {
+	f, err := fs.Open(path.Join(prefix, requestedPath))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	// Goのfs.Openはディレクトリを読みこもとうしてもエラーにはならないがここでは邪魔なのでエラー扱いにする
+	stat, _ := f.Stat()
+	if stat.IsDir() {
+		return ErrDir
+	}
+	contentType := mime.TypeByExtension(filepath.Ext(requestedPath))
+	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Cache-Control", "max-age=864000")
+	_, err = io.Copy(w, f)
+	return err
 }

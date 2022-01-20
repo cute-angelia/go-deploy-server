@@ -186,7 +186,7 @@ export default {
 
 <style scoped>
 .box-card {
-  width: 466px;
+  width: 410px;
   display: inline-block;
   margin: 10px 5px 0px 0px;
 }
