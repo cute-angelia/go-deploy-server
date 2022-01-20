@@ -20,6 +20,30 @@
 - server和client采用tcp通讯+心跳保活 节点在线状态实时监控
 - 支持befor_deploy、after_deploy 部署前和部署后的hook命令，清理缓存、执行重启等操作。 如：sudo service php-fpm reload
  
+ ### 本机开发
+ 1. 启动前端代码
+    
+    ```
+    cd cmd/server/vue
+    npm run serve
+    ```
+    
+ 2. 启动后端服务端
+ 
+    ```
+    go run server.go -c server.json
+    ```
+ 
+ 3. 启动后端客户端（可选）
+ 
+    ```
+    go run client.go -l :8093
+    ```
+ 
+### 部署到线上
+
+安全起见配置 jwt_secret 
+ 
 ### Server端配置
 ```
 |---server
@@ -96,4 +120,6 @@ server {
 ```
 
 # 参考
+
 项目代码基于[ikool-cn/go-deploy](https://github.com/ikool-cn/go-deploy/)
+

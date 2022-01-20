@@ -6,17 +6,17 @@ import axios from "axios";
 
 const { Secure } = require("mali-secure")
 // ==== 修改 ====
-var AppId = "20211224154810397966";
-var secret = "1b7892b373d922b5ba548a2d324ee0c3";
+var AppId = "20220119111341818363";
+var secret = "22ade93aadcef15bb317e6e643ea053b";
 var version = "1.0.1";
 const secure = new Secure(AppId, 1, "", secret, version)
 // ==== End ====
 
 var routeMap = {
-  List: "/list",
-  Showlog: "/showlog",
-  Deploy: "/deploy",
-  Rollback: "/rollback",
+  List: "/api/list",
+  Showlog: "/api/showlog",
+  Deploy: "/api/deploy",
+  Rollback: "/api/rollback",
 };
 
 // 获取映射 URL

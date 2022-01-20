@@ -1,6 +1,7 @@
 {
   "listen_http": ":8082",
   "debug": true,
+  "jwt_secret" : "",
   "apps": [
     {
       "name": "douke",

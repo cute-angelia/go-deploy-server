@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"embed"
 	"errors"
+	"github.com/cute-angelia/go-utils/cache/bunt"
 	"github.com/cute-angelia/go-utils/logger"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"go-deploy/config"
 	"go-deploy/internal/controller"
+	"go-deploy/internal/middleware"
 	"io"
 	"log"
 	"mime"
@@ -23,23 +25,26 @@ import (
 //go:embed vue/dist/*
 var assets embed.FS
 
-const TYPE_SITE = "go-deploy-server"
+const PROJECT_NAME = "go-deploy-server"
 
 func main() {
 	// config
 	config.InitConfig()
 
 	// 日志
-	logger.NewLogger(TYPE_SITE, !config.C.Debug)
+	logger.NewLogger(PROJECT_NAME, !config.C.Debug)
+
+	// bunt
+	bunt.InitBuntCache("cache", PROJECT_NAME+".db")
 
 	// router
 	r := chi.NewRouter()
-	r.Use(middleware.RequestID)
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Timeout(30 * time.Second))
-	r.Use(middleware.ThrottleBacklog(20, 500, time.Second))
+	r.Use(chiMiddleware.RequestID)
+	r.Use(chiMiddleware.Recoverer)
+	r.Use(chiMiddleware.RealIP)
+	r.Use(chiMiddleware.Logger)
+	r.Use(chiMiddleware.Timeout(30 * time.Second))
+	r.Use(chiMiddleware.ThrottleBacklog(20, 500, time.Second))
 
 	// Basic CORS
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
@@ -55,7 +60,16 @@ func main() {
 	}))
 
 	// 中间件
-	r.Route("/", func(r chi.Router) {
+	r.Route("/api", func(r chi.Router) {
+		log.Println("jwt", config.C.JwtSecret)
+		// 接入 sign && jwt 校验
+		if len(config.C.JwtSecret) > 0 {
+			r.Use(
+				middleware.SignPass([]string{}, "22ade93aadcef15bb317e6e643ea053b"),
+				middleware.Jwt([]string{}, config.C.JwtSecret),
+			)
+		}
+
 		r.Mount("/list", controller.List{}.Routes())
 		r.Mount("/deploy", controller.Deploy{}.Routes())
 		r.Mount("/rollback", controller.Rollback{}.Routes())
@@ -69,7 +83,7 @@ func main() {
 		go Ping(addr)
 	}
 
-	log.Println(TYPE_SITE + "启动成功~ " + config.C.ListenHttp)
+	log.Println(PROJECT_NAME + "启动成功~ " + config.C.ListenHttp)
 	if err := http.ListenAndServe(config.C.ListenHttp, r); err != nil {
 		log.Println("启动错误：", err)
 	}
@@ -147,7 +161,9 @@ func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 }
+
 var ErrDir = errors.New("path is dir")
+
 func tryRead(fs embed.FS, prefix, requestedPath string, w http.ResponseWriter) error {
 	f, err := fs.Open(path.Join(prefix, requestedPath))
 	if err != nil {

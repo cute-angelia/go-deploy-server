@@ -9,8 +9,8 @@ import { createRouter, createWebHistory } from "vue-router";
 // 每个路由都需要映射到一个组件。
 // 我们后面再讨论嵌套路由。
 const routes = [
-  { path: '/', name: "home", component: () => import(/* webpackChunkName: "home" */ '@/views/yqgame.vue') }
-  // { path: '/yqgame', name: "yqgame", component: () => import(/* webpackChunkName: "yqgame" */ '@/views/yqgame.vue') } // 云圈游戏
+  { path: '/', name: "home", component: () => import(/* webpackChunkName: "home" */ '@/views/home.vue') },
+  { path: '/yqgame', name: "yqgame", component: () => import(/* webpackChunkName: "yqgame" */ '@/views/yqgame.vue') } // 云圈游戏
 ]
 
 // 3. 创建路由实例并传递 `routes` 配置

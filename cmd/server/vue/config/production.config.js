@@ -1,3 +1,3 @@
 module.exports = {
-  BASE_API_URL: "http://127.0.0.1:30018"
+  BASE_API_URL: "http://host-91.bestmali.cn:30018"
 };

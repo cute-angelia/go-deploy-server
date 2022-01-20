@@ -35,10 +35,10 @@
         {{ inode.alias }}
       </div>
       <div class="bottom" style="margin: 10px 0px">
-        <time class="time">历史提交</time>
+        <time class="time">历史</time>
         <el-select
           v-model="item.reversion"
-          style="margin: 0px 5px; width: 200px"
+          style="margin: 0px 5px"
           class="m-2"
           size="mini"
         >
@@ -186,7 +186,7 @@ export default {
 
 <style scoped>
 .box-card {
-  width: 410px;
+  width: 390px;
   display: inline-block;
   margin: 10px 5px 0px 0px;
 }
