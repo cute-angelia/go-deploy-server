@@ -96,4 +96,4 @@ server {
 ```
 
 # 参考
-[项目代码参考了ikool-cn/go-deploy](https://github.com/ikool-cn/go-deploy/)
+项目代码基于[ikool-cn/go-deploy](https://github.com/ikool-cn/go-deploy/)
