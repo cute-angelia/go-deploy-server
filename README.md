@@ -19,6 +19,7 @@
 
 # Screenshot
 ![](https://github.com/cute-angelia/go-deploy-server/blob/master/screenshot1.png)
+![](https://github.com/cute-angelia/go-deploy-server/blob/master/screenshot2.png)
 
 ### 特性
 - 平台支持 windows, linux
