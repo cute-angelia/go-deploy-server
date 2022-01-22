@@ -61,7 +61,6 @@ func main() {
 
 	// 中间件
 	r.Route("/api", func(r chi.Router) {
-		log.Println("jwt", config.C.JwtSecret)
 		// 接入 sign && jwt 校验
 		if len(config.C.JwtSecret) > 0 {
 			r.Use(

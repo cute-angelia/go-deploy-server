@@ -2,7 +2,6 @@ package helper
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"github.com/go-cmd/cmd"
 	"log"
@@ -76,6 +75,7 @@ func RunShellCmd(command string) ([]byte, error) {
 	return bf.Bytes(), finalStatus.Error
 }
 
+// Deprecated: 请使用 RunShellCmd
 func RunShell(command string) ([]byte, error) {
 	//cmd := exec.Command("/bin/bash", "-c", `ps -eaf|grep "nginx: master"|grep -v "grep"|awk '{print $2}'`)
 	cmd := new(exec.Cmd)
@@ -95,14 +95,4 @@ func RunShell(command string) ([]byte, error) {
 	}
 	// log.Println(string(out))
 	return out, nil
-}
-
-func JsonResp(status bool, msg string, elapsed string, data interface{}) []byte {
-	bytes, _ := json.Marshal(struct {
-		Status  bool
-		Msg     string
-		Elapsed string
-		Data    interface{}
-	}{Status: status, Msg: msg, Elapsed: elapsed, Data: data})
-	return bytes
 }
