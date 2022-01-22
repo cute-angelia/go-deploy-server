@@ -92,7 +92,7 @@ func handleConn(conn net.Conn) {
 			ret, err := processTask(message)
 			if err != nil {
 				log.Println("Process error", err)
-				ret = []byte(err.Error())
+				// ret = []byte(err.Error())
 			}
 
 			//replace \n with special chars
@@ -139,30 +139,27 @@ func processTask(message string) ([]byte, error) {
 		//exec pre script
 		if strings.TrimSpace(msg.BeforDeploy) != "" {
 			log.Println("exec pre command:", command)
-			byt, err := helper.RunShell(msg.BeforDeploy)
+			byt, err := helper.RunShellCmd(msg.BeforDeploy)
+			bytes = append(bytes, byt...)
 			if err != nil {
-				return nil, err
-			} else {
-				bytes = append(bytes, byt...)
+				return bytes, err
 			}
 		}
 
 		//exec command
-		byt, err := helper.RunShell(command)
+		byt, err := helper.RunShellCmd(command)
+		bytes = append(bytes, byt...)
 		if err != nil {
-			return nil, err
-		} else {
-			bytes = append(bytes, byt...)
+			return bytes, err
 		}
 
 		//exec post script
 		if strings.TrimSpace(msg.AfterDeploy) != "" {
 			log.Println("exec post command:", command)
-			byt, err := helper.RunShell(msg.AfterDeploy)
+			byt, err := helper.RunShellCmd(msg.AfterDeploy)
+			bytes = append(bytes, byt...)
 			if err != nil {
-				return nil, err
-			} else {
-				bytes = append(bytes, byt...)
+				return bytes, err
 			}
 		}
 		return bytes, nil

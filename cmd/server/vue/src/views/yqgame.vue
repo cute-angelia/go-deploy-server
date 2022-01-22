@@ -85,7 +85,8 @@
 <script>
 import { ipost } from "@/utils/api";
 import AnnIconFont from "@/components/AnnIconFont.vue";
-import { ElMessage } from "element-plus";
+import { h } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 export default {
   components: { AnnIconFont },
@@ -146,12 +147,26 @@ export default {
         groupid: item.groupid,
       }).then((data) => {
         if (data.code == 0) {
-          //that.tableList = data.data;
-          ElMessage({
-            message:
-              "运行时间：" + data.data.time_cos + "s \n消息" + data.data.msg,
-            type: "success",
-            duration: 5 * 1000,
+          ElMessageBox({
+            title: "通知",
+            message: h("div", null, [
+              h(
+                "font",
+                {
+                  style: "color: teal",
+                  display: "inherit",
+                },
+                "运行时间：" + data.data.time_cos + "s"
+              ),
+              h(
+                "span",
+                {
+                  style: "white-space: pre-wrap",
+                },
+                "\n\n" + data.data.msg
+              ),
+            ]),
+            confirmButtonText: "OK",
           });
         }
       });
@@ -170,11 +185,26 @@ export default {
         reversion: item.reversion,
       }).then((data) => {
         if (data.code == 0) {
-          ElMessage({
-            message:
-              "运行时间：" + data.data.time_cos + "s \n消息" + data.data.msg,
-            type: "success",
-            duration: 5 * 1000,
+          ElMessageBox({
+            title: "通知",
+            message: h("div", null, [
+              h(
+                "font",
+                {
+                  style: "color: teal",
+                  display: "inherit",
+                },
+                "运行时间：" + data.data.time_cos + "s"
+              ),
+              h(
+                "span",
+                {
+                  style: "white-space: pre-wrap",
+                },
+                "\n\n" + data.data.msg
+              ),
+            ]),
+            confirmButtonText: "OK",
           });
         }
       });
