@@ -1,4 +1,4 @@
 .PHONY: run
 
 run:
-	go run server.go -c server.json
+	go run main.go -c server.json

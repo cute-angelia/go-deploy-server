@@ -8,7 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/cute-angelia/go-utils/logger"
-	"go-deploy/internal/helper"
+	"go-deploy/internal/utils"
 	"log"
 	"net"
 	"os"
@@ -139,7 +139,7 @@ func processTask(message string) ([]byte, error) {
 		//exec pre script
 		if strings.TrimSpace(msg.BeforDeploy) != "" {
 			log.Println("exec pre command:", command)
-			byt, err := helper.RunShellCmd(msg.BeforDeploy)
+			byt, err := utils.RunShellCmd(msg.BeforDeploy)
 			bytes = append(bytes, byt...)
 			if err != nil {
 				return bytes, err
@@ -147,7 +147,7 @@ func processTask(message string) ([]byte, error) {
 		}
 
 		//exec command
-		byt, err := helper.RunShellCmd(command)
+		byt, err := utils.RunShellCmd(command)
 		bytes = append(bytes, byt...)
 		if err != nil {
 			return bytes, err
@@ -156,7 +156,7 @@ func processTask(message string) ([]byte, error) {
 		//exec post script
 		if strings.TrimSpace(msg.AfterDeploy) != "" {
 			log.Println("exec post command:", command)
-			byt, err := helper.RunShellCmd(msg.AfterDeploy)
+			byt, err := utils.RunShellCmd(msg.AfterDeploy)
 			bytes = append(bytes, byt...)
 			if err != nil {
 				return bytes, err

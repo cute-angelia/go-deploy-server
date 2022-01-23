@@ -8,7 +8,7 @@ import (
 	"github.com/cute-angelia/go-utils/syntax/istrings"
 	"github.com/go-chi/chi/v5"
 	"go-deploy/config"
-	"go-deploy/internal/helper"
+	"go-deploy/internal/utils"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -65,13 +65,13 @@ func showlog(groupid string) (list LogList, err error) {
 
 //svn log --limit 100 svn://x.x.x.x/path
 func showSvnLog(app config.Apps) (list LogList, err error) {
-	bytes, err := helper.RunShell(fmt.Sprintf("svn log --limit 20 %s", app.Url))
+	bytes, err := utils.RunShell(fmt.Sprintf("svn log --limit 20 %s", app.Url))
 	if err != nil {
 		return nil, err
 	} else {
 		var convertStr string
 		var svnlogRegex = new(regexp.Regexp)
-		if helper.IsWin() {
+		if utils.IsWindows() {
 			convertStr = istrings.GbkToUtf8(string(bytes))
 			svnlogRegex = regexp.MustCompile(`r(\d+) \| (\w+) \| (.*) \+0800(?:.*)\r\n\r\n(.*)\r\n--`)
 		} else {
@@ -94,7 +94,7 @@ func showSvnLog(app config.Apps) (list LogList, err error) {
 //cd /pathto/xx && git log -50 --pretty="%h {CRLF} %an {CRLF} %at {CRLF} %s"
 func showGitLog(app config.Apps) (list LogList, err error) {
 	cmd := fmt.Sprintf(`cd %s && git log -20 --pretty="%%h %s %%an %s %%at %s %%s"`, app.Fetchlogpath, separator, separator, separator)
-	bytes, err := helper.RunShell(cmd)
+	bytes, err := utils.RunShell(cmd)
 	if err != nil {
 		return nil, err
 	} else {

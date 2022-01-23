@@ -1,4 +1,4 @@
-package helper
+package utils
 
 import (
 	"bytes"
@@ -6,15 +6,9 @@ import (
 	"github.com/go-cmd/cmd"
 	"log"
 	"os/exec"
-	"runtime"
 	"strings"
 	"time"
 )
-
-func IsWin() bool {
-	sysType := runtime.GOOS
-	return sysType == "windows"
-}
 
 // commond dir
 func FlapCmd(command string) (string, string) {
@@ -79,7 +73,7 @@ func RunShellCmd(command string) ([]byte, error) {
 func RunShell(command string) ([]byte, error) {
 	//cmd := exec.Command("/bin/bash", "-c", `ps -eaf|grep "nginx: master"|grep -v "grep"|awk '{print $2}'`)
 	cmd := new(exec.Cmd)
-	if IsWin() {
+	if IsWindows() {
 		log.Println("exec command:", "cmd /C", command)
 		cmd = exec.Command("cmd", "/C", command)
 		//cmd = exec.Command("powershell", "-c", command)
