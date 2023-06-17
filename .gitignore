@@ -37,4 +37,6 @@ node_modules
 .vscode
 .zip
 
+server.json
+
 cmd/server/server.json

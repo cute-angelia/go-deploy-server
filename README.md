@@ -35,11 +35,17 @@
     ```
     cd cmd/server/vue
     npm run serve
+    
+    
     ```
     
  2. 启动后端服务端
  
     ```
+    cp server.example.json server.json 
+    
+    npm run build
+    
     go run server.go -c server.json
     ```
  
