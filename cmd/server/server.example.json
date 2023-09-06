@@ -7,7 +7,6 @@
       "name": "douke",
       "type": "svn",
       "url": "svn://192.168.1.207/xiaohua",
-      "fetchlogpath": "/data/fetch_log/xiaohua/trunk",
       "node": [
         {
           "alias": "api-1",
@@ -29,7 +28,6 @@
       "name": "ymrj",
       "type": "svn",
       "url": "svn://192.168.1.207/taoxiaomei",
-      "fetchlogpath": "/data/fetch_log/xiaohua/trunk",
       "node": [
         {
           "alias": "api-1",
@@ -51,7 +49,6 @@
       "name": "test-git",
       "type": "git",
       "url": "https://gitee.com/ikool/test.git",
-      "fetchlogpath": "/data/fetch_log/test",
       "node": [
         {
           "alias": "api-1",

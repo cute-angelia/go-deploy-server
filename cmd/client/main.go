@@ -8,7 +8,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/cute-angelia/go-utils/logger"
-	"go-deploy/internal/utils"
+	"go-deploy/pkg/consts"
+	"go-deploy/pkg/utils"
 	"log"
 	"net"
 	"os"
@@ -19,15 +20,6 @@ import (
 var listening *string
 var debug *string
 var usage = `Usage: /pathto/client -l :8081 -d false`
-
-type Message struct {
-	Type        string `json:"type"`
-	Path        string `json:"path"`
-	Action      string `json:"action"`
-	Reversion   string `json:"reversion,omitempty"`
-	BeforDeploy string `json:"befor_deploy"`
-	AfterDeploy string `json:"after_deploy"`
-}
 
 func main() {
 	flag.Usage = func() {
@@ -108,10 +100,10 @@ func handleConn(conn net.Conn) {
 	}
 }
 
-//git reset --hard 4f32685 || svn up -r 999
-//git pull ||svn up
+// git reset --hard 4f32685 || svn up -r 999
+// git pull ||svn up
 func processTask(message string) ([]byte, error) {
-	msg := &Message{}
+	msg := &consts.CmdMessage{}
 	err := json.Unmarshal([]byte(message), msg)
 	if err != nil {
 		log.Print("Json decode error: " + err.Error())
@@ -130,6 +122,12 @@ func processTask(message string) ([]byte, error) {
 			command = fmt.Sprintf("cd %s && git reset --hard %s", msg.Path, msg.Reversion)
 		} else {
 			command = fmt.Sprintf("cd %s && svn up -r %s", msg.Path, msg.Reversion)
+		}
+	} else if msg.Action == "showlog" {
+		if msg.Type == "git" {
+			command = fmt.Sprintf(`cd %s && git log -20 --pretty="%%h %s %%an %s %%at %s %%s"`, msg.Path, consts.Separator, consts.Separator, consts.Separator)
+		} else {
+			command = fmt.Sprintf("svn log --limit 20")
 		}
 	}
 

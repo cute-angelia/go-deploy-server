@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/cute-angelia/go-utils/http/api"
@@ -8,7 +9,8 @@ import (
 	"github.com/cute-angelia/go-utils/syntax/istrings"
 	"github.com/go-chi/chi/v5"
 	"go-deploy/config"
-	"go-deploy/internal/utils"
+	"go-deploy/pkg/consts"
+	"go-deploy/pkg/utils"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -63,7 +65,7 @@ func showlog(groupid string) (list LogList, err error) {
 	return nil, errors.New("groupid invalid")
 }
 
-//svn log --limit 100 svn://x.x.x.x/path
+// svn log --limit 100 svn://x.x.x.x/path
 func showSvnLog(app config.Apps) (list LogList, err error) {
 	bytes, err := utils.RunShell(fmt.Sprintf("svn log --limit 20 %s", app.Url))
 	if err != nil {
@@ -91,8 +93,35 @@ func showSvnLog(app config.Apps) (list LogList, err error) {
 	}
 }
 
-//cd /pathto/xx && git log -50 --pretty="%h {CRLF} %an {CRLF} %at {CRLF} %s"
+// cd /pathto/xx && git log -50 --pretty="%h {CRLF} %an {CRLF} %at {CRLF} %s"
 func showGitLog(app config.Apps) (list LogList, err error) {
+	jobExecChan := make(chan jobExecResult, 1)
+	chanLen := 0
+	for _, node := range app.Node {
+		if node.Online {
+			jobBody, _ := json.Marshal(consts.CmdMessage{
+				Type:        node.Type,
+				Path:        node.Path,
+				BeforDeploy: "",
+				AfterDeploy: "",
+				Action:      "showlog",
+				Reversion:   "",
+			})
+			chanLen++
+			go dispatchJob(jobBody, jobExecChan, node.Addr, app.Name, node.Alias)
+		}
+	}
+
+	resp := ""
+	for i := 0; i < chanLen; i++ {
+		exeRet := <-jobExecChan
+		if exeRet.Err != nil {
+			resp += fmt.Sprintf("[%s:%s]\nERROR: %s", exeRet.AppName, exeRet.NodeName, exeRet.Err.Error())
+		} else {
+			resp += fmt.Sprintf("[%s:%s]\n%s", exeRet.AppName, exeRet.NodeName, exeRet.Message)
+		}
+	}
+
 	cmd := fmt.Sprintf(`cd %s && git log -20 --pretty="%%h %s %%an %s %%at %s %%s"`, app.Fetchlogpath, separator, separator, separator)
 	bytes, err := utils.RunShell(cmd)
 	if err != nil {

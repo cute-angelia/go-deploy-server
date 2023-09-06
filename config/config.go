@@ -44,7 +44,7 @@ func InitConfig() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, configUsage+"\n")
 	}
-	file := flag.String("c", "", configUsage)
+	file := flag.String("c", "server.json", configUsage)
 	flag.Parse()
 	if *file == "" {
 		flag.Usage()

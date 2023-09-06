@@ -81,7 +81,7 @@ export default {
 
           // 跳转
           setTimeout(() => {
-            this.$router.push({ name: "yqgame", query: {} });
+            this.$router.push({ name: "wechatwork", query: {} });
           }, 200);
         }
       } else {
@@ -104,7 +104,7 @@ export default {
 
           // 跳转
           setTimeout(() => {
-            this.$router.push({ name: "yqgame", query: {} });
+            this.$router.push({ name: "wechatwork", query: {} });
           }, 200);
         })
         .catch((error) => {

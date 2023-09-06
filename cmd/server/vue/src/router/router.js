@@ -10,7 +10,7 @@ import { createRouter, createWebHistory } from "vue-router";
 // 我们后面再讨论嵌套路由。
 const routes = [
   { path: '/', name: "home", component: () => import(/* webpackChunkName: "home" */ '@/views/home.vue') },
-  { path: '/yqgame', name: "yqgame", component: () => import(/* webpackChunkName: "yqgame" */ '@/views/yqgame.vue') } // 云圈游戏
+  { path: '/wechatwork', name: "wechatwork", component: () => import(/* webpackChunkName: "wechatwork" */ '@/views/wechatwork.vue') } // 企业微信
 ]
 
 // 3. 创建路由实例并传递 `routes` 配置

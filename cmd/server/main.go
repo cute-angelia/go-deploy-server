@@ -9,9 +9,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"go-deploy/cmd/server/internal/controller"
+	"go-deploy/cmd/server/internal/middleware"
 	"go-deploy/config"
-	"go-deploy/internal/controller"
-	"go-deploy/internal/middleware"
 	"io"
 	"log"
 	"mime"
@@ -139,7 +139,7 @@ func Ping(addr string) {
 	}
 }
 
-//set client online or offline
+// set client online or offline
 func setClientOnlineStatus(addr string, online bool) {
 	for key, app := range config.C.Apps {
 		for k, node := range app.Node {
