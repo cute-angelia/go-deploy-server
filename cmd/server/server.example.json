@@ -49,6 +49,7 @@
       "name": "test-git",
       "type": "git",
       "url": "https://gitee.com/ikool/test.git",
+      "fetchlogpath": "",// 旧版本获取提交日志
       "node": [
         {
           "alias": "api-1",

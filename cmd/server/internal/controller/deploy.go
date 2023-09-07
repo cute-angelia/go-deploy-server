@@ -22,7 +22,43 @@ type Deploy struct {
 func (rs Deploy) Routes() chi.Router {
 	r := chi.NewRouter()
 	r.Post("/", rs.index)
+
+	r.Post("/updateByName", rs.updateByName)
 	return r
+}
+
+func (rs Deploy) updateByName(w http.ResponseWriter, r *http.Request) {
+	// 参数校验
+	valid := validation.Validation{}
+	var u = struct {
+		Name string `valid:"Required;"`
+	}{
+		Name: api.Post(r, "name"),
+	}
+	if err := valid.Submit(u); err != nil {
+		api.Error(w, r, nil, err.Error(), -1)
+		return
+	}
+
+	start := time.Now()
+	var currentId string
+	for _, app := range config.C.Apps {
+		if app.Name == u.Name {
+			currentId = app.GroupId
+		}
+	}
+	ret := deply(currentId)
+
+	resp := struct {
+		TimeCos string `json:"time_cos"`
+		Msg     string `json:"msg"`
+	}{
+		TimeCos: strconv.FormatFloat(time.Since(start).Seconds(), 'f', 3, 64),
+		Msg:     strings.Replace(ret, separator, "\n", -1),
+	}
+
+	api.Success(w, r, resp, "success")
+	return
 }
 
 func (rs Deploy) index(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +89,7 @@ func (rs Deploy) index(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-//send a update message to the group nodes
+// send a update message to the group nodes
 func deply(groupid string) string {
 	for _, app := range config.C.Apps {
 		if app.GroupId == groupid {
@@ -90,7 +126,7 @@ func deply(groupid string) string {
 	return ""
 }
 
-//send job to client and get execute result
+// send job to client and get execute result
 func dispatchJob(jobBody []byte, jobExecChan chan jobExecResult, addr string, appName string, nodeName string) {
 	execResult := jobExecResult{AppName: appName, NodeName: nodeName}
 	conn, err := net.Dial("tcp", addr)

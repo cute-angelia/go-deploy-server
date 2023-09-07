@@ -64,8 +64,12 @@ func main() {
 		// 接入 sign && jwt 校验
 		if len(config.C.JwtSecret) > 0 {
 			r.Use(
-				middleware.SignPass([]string{}, "22ade93aadcef15bb317e6e643ea053b"),
-				middleware.Jwt([]string{}, config.C.JwtSecret),
+				middleware.SignPass([]string{
+					"/api/deploy/updateByName",
+				}, "22ade93aadcef15bb317e6e643ea053b"),
+				middleware.Jwt([]string{
+					"/api/deploy/updateByName",
+				}, config.C.JwtSecret),
 			)
 		}
 
@@ -99,11 +103,11 @@ func Ping(addr string) {
 			}
 
 			//connect success
-			setClientOnlineStatus(addr, true)
+			config.SetClientOnlineStatus(addr, true)
 
 			//remote client closed
 			defer func() {
-				setClientOnlineStatus(addr, false)
+				config.SetClientOnlineStatus(addr, false)
 				conn.Close()
 			}()
 
@@ -136,17 +140,6 @@ func Ping(addr string) {
 			}
 		}()
 		time.Sleep(time.Second * 5)
-	}
-}
-
-// set client online or offline
-func setClientOnlineStatus(addr string, online bool) {
-	for key, app := range config.C.Apps {
-		for k, node := range app.Node {
-			if node.Addr == addr {
-				config.C.Apps[key].Node[k].Online = online
-			}
-		}
 	}
 }
 

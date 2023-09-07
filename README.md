@@ -72,7 +72,7 @@
       "name": "douke", // 名称
       "type": "svn",   // 类型：svn git
       "url": "svn://192.168.1.207/xiaohua", // 地址
-      "fetchlogpath": "/data/fetch_log/xiaohua/trunk", // 服务端机器目录， 提交日志文件地址：svn 留空；  git 请填一个地址存储提交日志，这个目录的作用仅仅是为了获取git提交日志用
+      "fetchlogpath": "/data/fetch_log/xiaohua/trunk", // version < 1.0.1 服务端机器目录， 提交日志文件地址：svn 留空；  git 请填一个地址存储提交日志，这个目录的作用仅仅是为了获取git提交日志用
       "node": [ // 机器节点
         {
           "alias": "api-1", // 名称
@@ -123,8 +123,3 @@ server {
    }
 }
 ```
-
-### 参考
-
-项目代码参考 [ikool-cn/go-deploy](https://github.com/ikool-cn/go-deploy/) 感谢
-

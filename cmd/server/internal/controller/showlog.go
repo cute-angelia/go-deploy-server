@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"github.com/cute-angelia/go-utils/http/api"
 	"github.com/cute-angelia/go-utils/http/validation"
+	"github.com/cute-angelia/go-utils/syntax/ijson"
 	"github.com/cute-angelia/go-utils/syntax/istrings"
 	"github.com/go-chi/chi/v5"
 	"go-deploy/config"
 	"go-deploy/pkg/consts"
 	"go-deploy/pkg/utils"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -95,33 +97,23 @@ func showSvnLog(app config.Apps) (list LogList, err error) {
 
 // cd /pathto/xx && git log -50 --pretty="%h {CRLF} %an {CRLF} %at {CRLF} %s"
 func showGitLog(app config.Apps) (list LogList, err error) {
-	jobExecChan := make(chan jobExecResult, 1)
-	chanLen := 0
+
+	var currentNode config.Node
 	for _, node := range app.Node {
 		if node.Online {
-			jobBody, _ := json.Marshal(consts.CmdMessage{
-				Type:        node.Type,
-				Path:        node.Path,
-				BeforDeploy: "",
-				AfterDeploy: "",
-				Action:      "showlog",
-				Reversion:   "",
-			})
-			chanLen++
-			go dispatchJob(jobBody, jobExecChan, node.Addr, app.Name, node.Alias)
+			currentNode = node
+			break
 		}
 	}
 
-	resp := ""
-	for i := 0; i < chanLen; i++ {
-		exeRet := <-jobExecChan
-		if exeRet.Err != nil {
-			resp += fmt.Sprintf("[%s:%s]\nERROR: %s", exeRet.AppName, exeRet.NodeName, exeRet.Err.Error())
-		} else {
-			resp += fmt.Sprintf("[%s:%s]\n%s", exeRet.AppName, exeRet.NodeName, exeRet.Message)
-		}
+	// 大于默认版本
+	log.Println(currentNode)
+	log.Println("版本", currentNode.Version, utils.CompareVersion(currentNode.Version, "1.0.1") >= 0)
+	if utils.CompareVersion(currentNode.Version, "1.0.1") >= 0 {
+		return showGitLogClient(app)
 	}
 
+	// 兼容旧版本
 	cmd := fmt.Sprintf(`cd %s && git log -20 --pretty="%%h %s %%an %s %%at %s %%s"`, app.Fetchlogpath, separator, separator, separator)
 	bytes, err := utils.RunShell(cmd)
 	if err != nil {
@@ -142,4 +134,49 @@ func showGitLog(app config.Apps) (list LogList, err error) {
 		}
 		return logList, nil
 	}
+}
+
+// showGitLogClient 需要客户端 version > 1.0.1
+func showGitLogClient(app config.Apps) (list LogList, err error) {
+	jobExecChan := make(chan jobExecResult, 1)
+	chanLen := 0
+	for _, node := range app.Node {
+		if node.Online {
+			jobBody, _ := json.Marshal(consts.CmdMessage{
+				Type:        node.Type,
+				Path:        node.Path,
+				BeforDeploy: "",
+				AfterDeploy: "",
+				Action:      "showlog",
+				Reversion:   "",
+			})
+
+			log.Println(string(jobBody))
+
+			chanLen++
+			go dispatchJob(jobBody, jobExecChan, node.Addr, app.Name, node.Alias)
+		}
+	}
+
+	exeRet := <-jobExecChan
+	log.Println(exeRet.Message)
+
+	logs := strings.Split(exeRet.Message, consts.Separator)
+	logList := make(LogList, 0)
+	for _, line := range logs {
+		if strings.TrimSpace(line) != "" {
+			line = strings.Replace(line, "\"", "", -1)
+			commitLog := strings.Split(line, "^")
+			timeInt64, err := strconv.ParseInt(strings.TrimSpace(commitLog[2]), 10, 64)
+			if err != nil {
+				timeInt64 = time.Now().Unix()
+			}
+			logList = append(logList, LogEntity{Reversion: commitLog[0], Author: commitLog[1], Time: time.Unix(timeInt64, 0).Format(dataFormat), Content: commitLog[3]})
+		}
+	}
+
+	log.Println(ijson.Pretty(logList))
+
+	return logList, nil
+
 }

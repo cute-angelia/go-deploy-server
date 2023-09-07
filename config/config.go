@@ -24,7 +24,7 @@ type Apps struct {
 	Type         string `json:"type"`
 	Url          string `json:"url"`
 	Node         []Node `json:"node"`
-	Fetchlogpath string `json:"fetchlogpath"`
+	Fetchlogpath string `json:"fetchlogpath,omitempty"`
 }
 
 type Node struct {
@@ -35,6 +35,7 @@ type Node struct {
 	BeforDeploy string `json:"befor_deploy"`
 	AfterDeploy string `json:"after_deploy"`
 	Online      bool   `json:"online,omitempty"`
+	Version     string `json:"version,omitempty"` // 增加版本号
 }
 
 var C *Config
@@ -89,4 +90,26 @@ func ParseJson(bytes []byte, v *Config) *Config {
 		panic(err)
 	}
 	return v
+}
+
+// SetClientOnlineStatus set client online or offline
+func SetClientOnlineStatus(addr string, online bool) {
+	for key, app := range C.Apps {
+		for k, node := range app.Node {
+			if node.Addr == addr {
+				C.Apps[key].Node[k].Online = online
+			}
+		}
+	}
+}
+
+// SetClientVersion set client version
+func SetClientVersion(addr string, version string) {
+	for key, app := range C.Apps {
+		for k, node := range app.Node {
+			if node.Addr == addr {
+				C.Apps[key].Node[k].Version = version
+			}
+		}
+	}
 }

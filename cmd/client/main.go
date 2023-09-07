@@ -19,7 +19,8 @@ import (
 
 var listening *string
 var debug *string
-var usage = `Usage: /pathto/client -l :8081 -d false`
+var version *string
+var usage = `Usage: /pathto/client -l :8081 -d false -v 1.0.1`
 
 func main() {
 	flag.Usage = func() {
@@ -27,6 +28,7 @@ func main() {
 	}
 	listening = flag.String("l", ":8081", usage)
 	debug = flag.String("d", "true", usage)
+	version = flag.String("v", "1.0.1", usage)
 	flag.Parse()
 	if *listening == "" {
 		flag.Usage()
@@ -37,7 +39,7 @@ func main() {
 	logger.NewLogger("go-deploy-client", *debug == "false")
 
 	//start tcp server
-	log.Printf("Start tcp server listening %s", *listening)
+	log.Printf("Start tcp server listening %s version:%s", *listening, *version)
 	ln, err := net.Listen("tcp", *listening)
 	if err != nil {
 		log.Println("Error listening:", err)
@@ -88,7 +90,7 @@ func handleConn(conn net.Conn) {
 			}
 
 			//replace \n with special chars
-			ret = bytes.Replace(ret, []byte{10}, []byte("{CRLF}"), -1)
+			ret = bytes.Replace(ret, []byte{10}, []byte(consts.Separator), -1)
 			ret = append(ret, '\n')
 			conn.SetWriteDeadline(time.Now().Add(3 * time.Second))
 			_, err = conn.Write(ret)
@@ -125,18 +127,20 @@ func processTask(message string) ([]byte, error) {
 		}
 	} else if msg.Action == "showlog" {
 		if msg.Type == "git" {
-			command = fmt.Sprintf(`cd %s && git log -20 --pretty="%%h %s %%an %s %%at %s %%s"`, msg.Path, consts.Separator, consts.Separator, consts.Separator)
+			command = fmt.Sprintf(`cd %s && git log -20 --pretty="%%h^%%an^%%at^%%s"`, msg.Path)
 		} else {
 			command = fmt.Sprintf("svn log --limit 20")
 		}
+	} else if msg.Action == "version" {
+		// 发送自身版本号
+		return []byte("version:" + *version), nil
 	}
 
 	if command != "" {
 		bytes := make([]byte, 0)
-
 		//exec pre script
 		if strings.TrimSpace(msg.BeforDeploy) != "" {
-			log.Println("exec pre command:", command)
+			log.Println("exec pre command:", msg.BeforDeploy)
 			byt, err := utils.RunShellCmd(msg.BeforDeploy)
 			bytes = append(bytes, byt...)
 			if err != nil {
@@ -145,6 +149,7 @@ func processTask(message string) ([]byte, error) {
 		}
 
 		//exec command
+		log.Println("command:", command)
 		byt, err := utils.RunShellCmd(command)
 		bytes = append(bytes, byt...)
 		if err != nil {
@@ -153,7 +158,7 @@ func processTask(message string) ([]byte, error) {
 
 		//exec post script
 		if strings.TrimSpace(msg.AfterDeploy) != "" {
-			log.Println("exec post command:", command)
+			log.Println("exec post command:", msg.AfterDeploy)
 			byt, err := utils.RunShellCmd(msg.AfterDeploy)
 			bytes = append(bytes, byt...)
 			if err != nil {
