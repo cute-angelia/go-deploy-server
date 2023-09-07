@@ -123,3 +123,23 @@ server {
    }
 }
 ```
+
+
+
+### 协议设计
+
+```
+ *  |----------Len--------|------------------------------------MetaInfo------------------------------------|
+ *  |---------4Byte-------|--------4Byte--------|----1Byte----|----------------X---------------------------|
+ *	+------------------------------------------------------------------------------------------------------+
+ *	|      Magic          |     PayloadLen      |   MsgType   |                Body                        |
+ *	+------------------------------------------------------------------------------------------------------+
+ 
+PayloadLen - length of body in byte, 3 bytes big-endian integer.
+Magic - magic number
+MsgType - package type, 1 byte
+    0x01: heartbeat package
+    0x02: data package
+    0x03: disconnect message from server
+body - binary payload.
+```
