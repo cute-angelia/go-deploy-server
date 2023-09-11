@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-
 	"github.com/panjf2000/gnet/v2"
+	"log"
 )
 
 var ErrIncompletePacket = errors.New("incomplete packet")
@@ -14,7 +14,7 @@ const (
 	magicNumber uint32 = 0x12346641
 
 	sizeMagicNumber = 4
-	sizeMsgType     = 1
+	sizeMsgType     = 2
 	sizeBodyLen     = 4
 )
 
@@ -78,6 +78,7 @@ func (codec *SimpleCodec) Decode(c gnet.Conn) (MsgType, []byte, error) {
 	}
 
 	if !bytes.Equal(magicNumberBytes, buf[:sizeMagicNumber]) {
+		log.Println(string(buf))
 		return MsgTypeZero, nil, errors.New("invalid magic number")
 	}
 
